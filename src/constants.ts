@@ -6,6 +6,6 @@ export const SCOPE_REQUIRED = 'read,activity:read_all'
 export const GRANT_TYPE_INIT = 'authorization_code'
 export const GRANT_TYPE_REFRESH = 'refresh_token'
 export const ENV_VARS = {
-  APP_DOMAIN_URL: import.meta.env.VITE_APP_DOMAIN_URL
+  APP_DOMAIN_URL: import.meta.env?.VITE_APP_DOMAIN_URL
 }
-
+export const ACCESS_TOKEN_NAME = 'access_token'

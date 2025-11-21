@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { toast } from 'react-toastify'
-import { CLIENT_ID, STRAVA_UI_URL, GRANT_TYPE_INIT, CLIENT_SECRET, SCOPE_REQUIRED } from "src/constants"
+import { CLIENT_ID, STRAVA_UI_URL, GRANT_TYPE_INIT, CLIENT_SECRET, SCOPE_REQUIRED, ACCESS_TOKEN_NAME } from "src/constants"
 import { errorMessage } from '@components/constants'
 import Cookies from 'js-cookie'
 
@@ -15,7 +15,7 @@ export const useAuth = () => {
   const authCode = window.location.href.split('code=')[1]?.split('&')?.[0]
   const scope = window.location.href.split('scope=')[1]?.split('&')?.[0]
 
-  const accessTokenCookie = Cookies.get('access_token')
+  const accessTokenCookie = Cookies.get(ACCESS_TOKEN_NAME)
   
   useEffect(() => {
     if (!isAuthorized && !accessTokenCookie) {
@@ -30,7 +30,7 @@ export const useAuth = () => {
           })
             .then((res) => res.json())  
             .then((data) => {
-              Cookies.set('access_token', data.access_token)
+              Cookies.set(ACCESS_TOKEN_NAME, data.access_token)
               setAuthToken(data.access_token)
             })
             .catch(() => {

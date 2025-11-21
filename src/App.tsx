@@ -1,3 +1,4 @@
+import { createContext } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import './App.css'
@@ -17,6 +18,9 @@ import { Analytics } from "@vercel/analytics/react"
 
 // const Popup = lazy(() => import('./components/Popup'))
 
+export const AuthTokenContext = createContext<string | null>(null)
+export const SetAuthTokenContext = createContext<React.Dispatch<React.SetStateAction<string | null>>>(() => {})
+
 const authUrl = `${STRAVA_UI_URL}/oauth/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${ENV_VARS.APP_DOMAIN_URL}&scope=activity%3Aread_all`
 
 function App() {
@@ -27,35 +31,37 @@ function App() {
   return (
     <>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
-        <ToastContainer />
-        {isAuthInProgress ? null : (
-          authToken ? (
-            <Media authToken={authToken} setAuthToken={setAuthToken} />
-          ) : (
-            <Stack>
-              {isAccessMissing ? (
-                <Alert severity="warning" sx={{ marginBottom: '2rem' }}>Please provide access to your data to be able to use IZHA app</Alert>
-              ) : null}
-              <Link href={authUrl} sx={{ height: '48px' }}>
-                <img src={stravaBtn} alt="Strava button" />
-              </Link>
-            </Stack>
-          )
-        )}
+        <AuthTokenContext value={authToken}>  
+          <SetAuthTokenContext value={setAuthToken}>
+            <ToastContainer />
+            {isAuthInProgress ? null : (
+              authToken ? (
+                <Media />
+              ) : (
+                <Stack>
+                  {isAccessMissing ? (
+                    <Alert severity="warning" sx={{ marginBottom: '2rem' }}>Please provide access to your data to be able to use IZHA app</Alert>
+                  ) : null}
+                  <Link href={authUrl} sx={{ height: '48px' }}>
+                    <img src={stravaBtn} data-testid="auth-btn" alt="Strava button" />
+                  </Link>
+                </Stack>
+              )
+            )}
+          </SetAuthTokenContext>
+        </AuthTokenContext>
 
-        {/* <div>
+        {/* <h1>Vite + React</h1>
+        <div>
           <a href="https://vite.dev" target="_blank">
-            <img src={viteLogo} className="logo" alt="Vite logo" />
+            <img src={viteLogo} className="logo" loading='lazy' alt="Vite logo" />
           </a>
           <a href="https://react.dev" target="_blank">
-            <img src={reactLogo} className="logo react" alt="React logo" />
+            <img src={reactLogo} className="logo react" loading='lazy' alt="React logo" />
           </a>
         </div>
-        <h1>Vite + React</h1>
+        
         <div className="card">
-          <button onClick={() => setCount((count) => count + 1)}>
-            count is {count}
-          </button>
           <p>
             Edit <code>src/App.tsx</code> and save to test HMR
           </p>

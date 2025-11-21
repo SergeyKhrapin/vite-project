@@ -1,9 +1,8 @@
 import { SortMedia } from "@components/constants"
 import { type IMediaSlide } from "@components/Media"
 
-export const sortMedia = (media: IMediaSlide[] | null, sorting: keyof typeof SortMedia | null) => {
-  console.log('sorting 2', sorting);
-  
+export const sortMediaByDate = (media: IMediaSlide[] | null, sorting: keyof typeof SortMedia | null) => {
+  // Note: sorting relies on activityId - the newer activity the bigger its id
   return (media ?? []).toSorted((a, b) => {
     const direction = sorting === SortMedia.DESC ? -1 : 1
     if (a.activityId === b.activityId) {          

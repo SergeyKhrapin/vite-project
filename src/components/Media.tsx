@@ -1,13 +1,13 @@
-import { useState, useEffect, type FC, useRef } from "react"
+import { useState, useEffect, useRef, useContext } from "react"
 import dayjs, { type Dayjs } from "dayjs"
 import { toast } from 'react-toastify'
 import Cookies from 'js-cookie'
-import { STRAVA_API_URL } from '../constants'
+import { ACCESS_TOKEN_NAME, STRAVA_API_URL } from '../constants'
 import { showPhotosLabel, showMorePhotosLabel, resetLabel, noPhotos, noActivities, authErrorMessage, errorMessage, sortLabel, SortMedia } from '@components/constants'
 import { DatePicker } from "@common/DatePicker"
 import { Lightbox } from "@common/Lightbox"
 import { PhotoAlbum } from "@common/PhotoAlbum"
-import { sortMedia } from "@utils/sortMedia"
+import { sortMediaByDate } from "@utils/sortMediaByDate"
 import Grid from "@mui/material/Grid"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
@@ -19,13 +19,16 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import { type Slide } from "yet-another-react-lightbox"
 import { type Photo } from "react-photo-album"
+import { useFetchData } from '@hooks/useFetchData'
+import { AuthTokenContext, SetAuthTokenContext } from "src/App"
+import { getActivitiesUrl } from "@utils/getActivitiesUrl"
 
 const imageSize = 5000
-const activitiesPerPage = 50
-interface IMedia {
-  authToken: string
-  setAuthToken: React.Dispatch<React.SetStateAction<string | null>>
-}
+
+// interface IMedia {
+//   authToken: string
+//   setAuthToken: React.Dispatch<React.SetStateAction<string | null>>
+// }
 
 interface IMediaItemExtraData {
   activityId: number
@@ -35,57 +38,101 @@ interface IMediaItemExtraData {
 
 export type IMediaSlide = IMediaItemExtraData & Slide
 
-export const Media: FC<IMedia> = ({ authToken, setAuthToken }) => {
-  const prevPage = useRef<number | null>(null)
+export const Media = () => {
+  const authToken = useContext(AuthTokenContext)
+  const setAuthToken = useContext(SetAuthTokenContext)
+  
   const [activities, setActivities] = useState<any[] | null>(null)
+  const nextPageActivities = useRef<any[] | null>(null)
   const [media, setMedia] = useState<IMediaSlide[] | null>(null)
   const [isMoreMedia, setIsMoreMedia] = useState(true)
   const [sorting, setSorting] = useState<keyof typeof SortMedia | null>(null)
   const [page, setPage] = useState(1)
+  const prevPage = useRef<number | null>(null)
   const [index, setIndex] = useState(-1)
   const [isLoading, setIsLoading] = useState(false)
   const [dateFrom, setDateFrom] = useState<Dayjs | null>(null)
   const [dateTo, setDateTo] = useState<Dayjs | null>(null)
+
+  const { fetchData } = useFetchData()
 
   const sortTooltipLabel = `${sortLabel} ${sorting === SortMedia.ASC ? '(latest > oldest)' : '(oldest > latest)'}`
 
   const afterTimestamp = dayjs(dateFrom).unix()
   const beforeTimestamp = dayjs(dateTo).set('date', dayjs(dateTo).get('date') + 1).unix() // include a selected day
   
-  const activitiesUrl =
-    `${STRAVA_API_URL}/athlete/activities?page=${page}&per_page=${activitiesPerPage}${dateTo ? '&before=' + beforeTimestamp : ''} ${dateFrom ? '&after=' + afterTimestamp : ''}`
+  // const activitiesUrl =
+  //   `${STRAVA_API_URL}/athlete/activities?page=${page}&per_page=${activitiesPerPage}${dateTo ? '&before=' + beforeTimestamp : ''} ${dateFrom ? '&after=' + afterTimestamp : ''}`
 
-  const fetchActivities = () => {
+  const fetchActivities = async () => {
     if (authToken) {
       setIsLoading(true)
 
-      fetch(activitiesUrl, {
-        headers: {
-          Authorization: `Bearer ${authToken}`
-        }
-      })
-        .then((data) => data.json())
-        .then((res) => {
-          if (res.message === 'Authorization Error') {
-            setAuthToken(null)
-            Cookies.remove('access_token')
-            toast(authErrorMessage, { type: 'error' })
-          } else if (!res.length) {
-            setIsLoading(false)
-            setIsMoreMedia(false)
-            if (page === 1) {
-              toast(noActivities, { type: 'info' })
-            }
-          } else {
-            setIsMoreMedia(res.length < activitiesPerPage ? false : true)
-            setActivities(res)
-            setPage(prev => ++prev)
+      console.log('nextActivities', nextPageActivities);
+
+      if (nextPageActivities?.current?.length) {
+        setActivities(nextPageActivities.current)
+        setPage(prev => ++prev)
+        nextPageActivities.current = await fetchNextActivities(getActivitiesUrl({
+          page: page + 1
+        }))
+      } else {
+        fetch(getActivitiesUrl({
+          page,
+          beforeTimestamp,
+          afterTimestamp
+        }), {
+          headers: {
+            Authorization: `Bearer ${authToken}`
           }
         })
-        .catch(() => {
-          setIsLoading(false)
-          toast(errorMessage, { type: 'error'})
-        })
+          .then((data) => data.json())
+          .then((res) => {
+            if (res.message === 'Authorization Error') {
+              setAuthToken(null)
+              Cookies.remove(ACCESS_TOKEN_NAME)
+              toast(authErrorMessage, { type: 'error' })
+            } else if (!res.length) {
+              setIsLoading(false)
+              // setIsMoreMedia(false)
+              if (page === 1) {
+                toast(noActivities, { type: 'info' })
+              }
+            } else {
+              // setIsMoreMedia(res.length < activitiesPerPage ? false : true)
+              setActivities(res)
+              setPage(prev => ++prev)
+              // TODO: await ?
+              fetchNextActivities(getActivitiesUrl({
+                page: page + 1,
+                beforeTimestamp,
+                afterTimestamp
+              }))
+            }
+          })
+          .catch(() => {
+            setIsLoading(false)
+            toast(errorMessage, { type: 'error'})
+          })
+      }
+    }
+  }
+
+  const fetchNextActivities = async (url: string) => {
+    const activities = await fetchData(url)
+    const isSomeActivityWithMedia = activities.some(a => a.total_photo_count > 0)
+    
+    if (isSomeActivityWithMedia) {
+      return activities
+    } else { // if no activities on the next page - fetch new activities starting from the next day after latest activity
+      // Note: sorting relies on activityId - the newer activity the bigger its id
+      const sortedActivities = activities.toSorted((a, b) => b.id - a.id)
+      const latestActivityDate = sortedActivities[0].start_date
+      const activities = await fetchData(getActivitiesUrl({
+        page: 1,
+        afterTimestamp: dayjs(latestActivityDate).set('date', dayjs(latestActivityDate).get('date') + 1).unix()
+      }))
+
     }
   }
 
@@ -103,7 +150,7 @@ export const Media: FC<IMedia> = ({ authToken, setAuthToken }) => {
   const handleSortMedia = () => {
     const newSorting = sorting === SortMedia.ASC ? SortMedia.DESC : SortMedia.ASC
     
-    setMedia(currentMedia => sortMedia(currentMedia, newSorting))
+    setMedia(currentMedia => sortMediaByDate(currentMedia, newSorting))
     setSorting(newSorting)
   }
 
@@ -180,7 +227,7 @@ export const Media: FC<IMedia> = ({ authToken, setAuthToken }) => {
         }
 
         setMedia((prev) => {
-          const sortedSlides = sortMedia(slides, sorting)
+          const sortedSlides = sortMediaByDate(slides, sorting)
           const isDateFromNoDateTo = dateFrom && !dateTo
 
           if ((sorting === SortMedia.DESC && !isDateFromNoDateTo) || (sorting === SortMedia.ASC && isDateFromNoDateTo)) {
@@ -209,7 +256,7 @@ export const Media: FC<IMedia> = ({ authToken, setAuthToken }) => {
       {!media || !media.length ? (
         <Grid size={12}>
           <Stack rowGap={2.5} width="100%">
-            <Button onClick={fetchActivities} loading={isLoading} variant="contained">{showPhotosLabel}</Button>
+            <Button onClick={fetchActivities} data-testid="show-photos" loading={isLoading} variant="contained">{showPhotosLabel}</Button>
             <Stack direction="row" columnGap={2}>
               <DatePicker
                 value={dateFrom}
