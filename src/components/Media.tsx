@@ -120,19 +120,18 @@ export const Media = () => {
 
   const fetchNextActivities = async (url: string) => {
     const activities = await fetchData(url)
-    const isSomeActivityWithMedia = activities.some(a => a.total_photo_count > 0)
+    const isSomeActivityWithMedia = activities.some((a: any) => a.total_photo_count > 0)
     
     if (isSomeActivityWithMedia) {
       return activities
     } else { // if no activities on the next page - fetch new activities starting from the next day after latest activity
       // Note: sorting relies on activityId - the newer activity the bigger its id
-      const sortedActivities = activities.toSorted((a, b) => b.id - a.id)
+      const sortedActivities = activities.toSorted((a: any, b: any) => b.id - a.id)
       const latestActivityDate = sortedActivities[0].start_date
-      const activities = await fetchData(getActivitiesUrl({
+      fetchData(getActivitiesUrl({
         page: 1,
         afterTimestamp: dayjs(latestActivityDate).set('date', dayjs(latestActivityDate).get('date') + 1).unix()
       }))
-
     }
   }
 
