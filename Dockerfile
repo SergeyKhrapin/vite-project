@@ -21,7 +21,7 @@ FROM base as build
 
 RUN npm run vitest && npm run build
 
-FROM nginx: stable-alpine3.17
+FROM nginx:stable-alpine3.17
 COPY --from=build /app/build /usr/share/nginx/htmll
 COPY --from=build /app/version.txt /usr/share/nginx/html/version.txt
 COPY config/nginx /etc/nginx
