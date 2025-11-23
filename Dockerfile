@@ -1,4 +1,4 @@
-FROM node: 20.4-alpines.18 AS base
+FROM node:20.4-alpines.18 AS base
 
 ARG VITE BRANCH NAME
 ARG VITE_ VERSION
