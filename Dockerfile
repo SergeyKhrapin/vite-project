@@ -4,9 +4,9 @@ ARG VITE BRANCH NAME
 ARG VITE_ VERSION
 ARG BUILD NUMBER
 
-ENV VITE_BRANCH_NAME=${VITE_BRANCH_ NAME}
+ENV VITE_BRANCH_NAME=${VITE_BRANCH_NAME}
 ENV VITE_VERSION=${VITE_VERSION}
-ENV BUILD_ NUMBER=${BUILD _NUMBER}
+ENV BUILD_ NUMBER=${BUILD_NUMBER}
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ COPY package-lock. json •
 RUN npm install --silent
 COPY . .
 
-RUN echo "Branch: "${VITE_BRANCH NAME}"; Version: "${VITE_VERSION}"; Build Number: "${BUILD _NUMBER}"" > /app/version.txt
+RUN echo "Branch: "${VITE_BRANCH NAME}"; Version: "${VITE_VERSION}"; Build Number: "${BUILD_NUMBER}"" > /app/version.txt
 
 FROM base as build
 
