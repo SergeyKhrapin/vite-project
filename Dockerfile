@@ -1,23 +1,23 @@
 FROM node:20.4-alpines.18 AS base
 
-ARG VITE BRANCH NAME
-ARG VITE_ VERSION
-ARG BUILD NUMBER
+ARG VITE_BRANCH_NAME
+ARG VITE_VERSION
+ARG BUILD_NUMBER
 
 ENV VITE_BRANCH_NAME=${VITE_BRANCH_NAME}
 ENV VITE_VERSION=${VITE_VERSION}
-ENV BUILD_ NUMBER=${BUILD_NUMBER}
+ENV BUILD_NUMBER=${BUILD_NUMBER}
 
 WORKDIR /app
 
 COPY package. json
-COPY package-lock. json •
+COPY package-lock. json
 RUN npm install --silent
 COPY . .
 
-RUN echo "Branch: "${VITE_BRANCH NAME}"; Version: "${VITE_VERSION}"; Build Number: "${BUILD_NUMBER}"" > /app/version.txt
+RUN echo "Branch: "${VITE_BRANCH_NAME}"; Version: "${VITE_VERSION}"; Build Number: "${BUILD_NUMBER}"" > /app/version.txt
 
-FROM base as build
+FROM base AS build
 
 RUN npm run vitest && npm run build
 
