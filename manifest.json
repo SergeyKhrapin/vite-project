@@ -1,14 +1,13 @@
 {
-  "short_name": "Izha",
-  "name": "Izha app",
+  "name": "Izha",
   "icons": [
     {
-      "src": "/logo.jpeg",
+      "src": "/public/logo.jpeg",
       "type": "image/jpeg",
       "sizes": "192x192"
     },
     {
-      "src": "/logo.jpeg",
+      "src": "/public/logo.jpeg",
       "type": "image/jpeg",
       "sizes": "512x512"
     }
