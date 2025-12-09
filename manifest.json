@@ -2,13 +2,13 @@
   "name": "Izha",
   "icons": [
     {
-      "src": "/public/logo.jpeg",
-      "type": "image/jpeg",
+      "src": "/logo.png",
+      "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/public/logo.jpeg",
-      "type": "image/jpeg",
+      "src": "/logo.png",
+      "type": "image/png",
       "sizes": "512x512"
     }
   ],
