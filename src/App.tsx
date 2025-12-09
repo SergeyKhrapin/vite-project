@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { createContext, useEffect } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import './App.css'
@@ -27,6 +27,10 @@ function App() {
   // const [count, setCount] = useState(0)
   // const [isPopupShown, setIsPopupShown] = useState(false)
   const { authToken, setAuthToken, isAuthInProgress, isAccessMissing } = useAuth()
+
+  useEffect(() => {
+    fetch('/api/test')
+  }, [])
   
   return (
     <>
