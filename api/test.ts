@@ -15,7 +15,7 @@
 export default function handler(req, res) {
   const { cookies = "", headers = "", query = "", body = ""} = req
 
-  res.setHeader('Access-Control-Allow-Origin', 'localhost:5173');
+  res.setHeader('Access-Control-Allow-Origin', 'https://www.strava.com');
   res.setHeader("Content-Security-Policy", "connect-src 'none'")
 
   res.status(200).json({
