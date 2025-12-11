@@ -36,7 +36,9 @@ function App() {
       e.preventDefault()
       console.log('Form submitted')
     })
-    form.submit()
+    setTimeout(() => {
+      form.requestSubmit()
+    }, 3000)
   }, [])
   
   return (
