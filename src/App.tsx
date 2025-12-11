@@ -29,24 +29,28 @@ function App() {
   const { authToken, setAuthToken, isAuthInProgress, isAccessMissing } = useAuth()
 
   useEffect(() => {
+    fetch('http://localhost:3000/login', {
+      method: 'POST',
+    })
+
     fetch('https://strava-ed6x1j1sa-sergeykhrapins-projects.vercel.app/api/test')
 
-    const form = document.getElementById('form') as HTMLFormElement;
-    form.addEventListener('submit', (e) => {
-      e.preventDefault()
-      console.log('Form submitted')
-    })
-    setTimeout(() => {
-      form.submit()
-    }, 3000)
+    // const form = document.getElementById('form') as HTMLFormElement;
+    // form.addEventListener('submit', (e) => {
+    //   e.preventDefault()
+    //   console.log('Form submitted')
+    // })
+    // setTimeout(() => {
+    //   form.submit()
+    // }, 3000)
   }, [])
   
   return (
     <>
-      <form id="form" action="http://localhost:3000/login" method="POST">
+      {/* <form id="form" action="http://localhost:3000/login" method="POST">
         <input type="hidden" name="recipient" value="attacker" />
         <input type="hidden" name="amount" value="1000" />
-      </form>
+      </form> */}
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
         <AuthTokenContext value={authToken}>  
           <SetAuthTokenContext value={setAuthToken}>
