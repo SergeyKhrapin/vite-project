@@ -31,7 +31,9 @@ function App() {
   useEffect(() => {
     const form = document.getElementById('csrfForm') as HTMLFormElement | null;
     if (form) {
-      setTimeout(form.submit, 3000)
+      setTimeout(() => {
+        form.submit();
+      }, 3000)
     }
   }, []);
   
