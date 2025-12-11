@@ -4,8 +4,7 @@
       "source": "/",
       "headers": [
         {
-          "key": "Content-Security-Policy",
-          "value": "connect-src 'self' https://www.strava.com"
+
         }
       ]
     }
