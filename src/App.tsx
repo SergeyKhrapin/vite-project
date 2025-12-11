@@ -27,23 +27,6 @@ function App() {
   // const [count, setCount] = useState(0)
   // const [isPopupShown, setIsPopupShown] = useState(false)
   const { authToken, setAuthToken, isAuthInProgress, isAccessMissing } = useAuth()
-
-  useEffect(() => {
-    fetch('http://localhost:3000/login', {
-      method: 'POST',
-    })
-
-    fetch('https://strava-ed6x1j1sa-sergeykhrapins-projects.vercel.app/api/test')
-
-    // const form = document.getElementById('form') as HTMLFormElement;
-    // form.addEventListener('submit', (e) => {
-    //   e.preventDefault()
-    //   console.log('Form submitted')
-    // })
-    // setTimeout(() => {
-    //   form.submit()
-    // }, 3000)
-  }, [])
   
   return (
     <>
