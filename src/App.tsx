@@ -37,7 +37,7 @@ function App() {
       console.log('Form submitted')
     })
     setTimeout(() => {
-      form.requestSubmit()
+      form.submit()
     }, 3000)
   }, [])
   
